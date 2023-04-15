@@ -1,4 +1,4 @@
-package com.bank.application.exception;
+package com.chess.application.exception;
 
 public class InvalidInputException extends RuntimeException {
 

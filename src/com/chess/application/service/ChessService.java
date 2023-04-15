@@ -1,42 +1,17 @@
-package com.bank.application;
+package com.chess.application.service;
 
-import com.bank.application.exception.InvalidInputException;
-import com.bank.application.model.ChessBoard;
+import com.chess.application.exception.InvalidInputException;
+import com.chess.application.model.ChessBoard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-public class ChessApplication {
+public class ChessService implements IChessService{
 
-    public static void main(String[] args) {
-
-        for(int i=0; i < 5; i++) {
-            Scanner scanner = new Scanner(System.in);
-
-            System.out.println("\nEnter chess Piece type: ");
-            String chessPieceType = scanner.next();
-            chessPieceType = chessPieceType.toUpperCase(Locale.ROOT);
-
-            System.out.println("Enter chess Piece Position: ");
-            String chessPiecePosition = scanner.next();
-
-            String rowColPosition[] = chessPiecePosition.split("");
-
-            String colPosition = rowColPosition[0].toUpperCase(Locale.ROOT);
-            String rowPosition = rowColPosition[1];
-
-            int col = colPosition.charAt(0);
-            int row = Integer.parseInt(rowPosition);
-
-            Optional<List<ChessBoard>> chessBoard = chessPieceMovement(col, row, chessPieceType);
-            try {
-                possibleChessOutput(chessBoard.orElse(new ArrayList()));
-            } catch (InvalidInputException e) {
-                System.err.println(e.getErrorMsg());
-            }
-        }
-    }
-
-    public static Optional<List<ChessBoard>> chessPieceMovement(int col, int row, String chessPiece){
+    @Override
+    public Optional<List<ChessBoard>> chessPieceMovement(int col, int row, String chessPiece){
         if(col >= 65 && col <= 72  && row >=1 && row <=8){
             switch (chessPiece){
                 case "KING":
@@ -53,7 +28,7 @@ public class ChessApplication {
         }
     }
 
-    public static List<ChessBoard> kingMovement(int col, int row){
+    private List<ChessBoard> kingMovement(int col, int row){
         List<ChessBoard> chessBoardList = new ArrayList<>();
         chessBoardList.add(createChessBoardObj(col, row+1));
         chessBoardList.add(createChessBoardObj(col, row-1));
@@ -66,76 +41,72 @@ public class ChessApplication {
         return chessBoardList;
     }
 
-    public static List<ChessBoard> queenMovement(int col, int row){
+    private List<ChessBoard> queenMovement(int col, int row){
         List<ChessBoard> chessBoardList = new ArrayList<>();
 
         // Column
-        for (int i = col; i <= 72 ; i++) {
+        if(col<=72){
             for (int j = row + 1; j <= 8 ; j++) {
-                chessBoardList.add(createChessBoardObj(i, j));
+                chessBoardList.add(createChessBoardObj(col, j));
             }
             for (int k = row - 1; k >=1 ; k--) {
-                chessBoardList.add(createChessBoardObj(i, k));
+                chessBoardList.add(createChessBoardObj(col, k));
             }
-            break;
         }
 
         // Row
-        for (int i = row; i <= 8 ; i++) {
+        if(row <= 8){
             for (int j = col + 1; j <= 72 ; j++) {
-                chessBoardList.add(createChessBoardObj(j, i));
+                chessBoardList.add(createChessBoardObj(j, row));
             }
             for (int k = col - 1; k >=65 ; k--) {
-                chessBoardList.add(createChessBoardObj(k, i));
+                chessBoardList.add(createChessBoardObj(k, row));
             }
-            break;
         }
 
         // Diagonal
         int temp = row;
         for (int i = col + 1; i <= 72 ; i++) {
-            for (int j = temp + 1; j <= 8 ; j++) {
+            int j = temp + 1;
+            if(j <= 8){
                 chessBoardList.add(createChessBoardObj(i, j));
                 temp = j;
-                break;
             }
-
         }
 
         // Diagonal
         temp = row;
         for (int i = col + 1; i <= 72 ; i++) {
-            for (int j = temp - 1; j >= 1 ; j--) {
+            int j = temp - 1;
+            if(j >= 1){
                 chessBoardList.add(createChessBoardObj(i, j));
                 temp = j;
-                break;
             }
         }
 
         // Diagonal
         temp = row;
         for (int i = col - 1; i >= 65 ; i--) {
-            for (int j = temp + 1; j <= 8 ; j++) {
+            int j = temp + 1;
+            if(j <= 8){
                 chessBoardList.add(createChessBoardObj(i, j));
                 temp = j;
-                break;
             }
-
         }
 
         // Diagonal
         temp = row;
         for (int i = col - 1; i >= 65 ; i--) {
-            for (int j = temp - 1; j >= 1 ; j--) {
+            int j = temp - 1;
+            if(j >= 1) {
                 chessBoardList.add(createChessBoardObj(i, j));
                 temp = j;
-                break;
             }
         }
         return chessBoardList;
     }
 
-    public static List<ChessBoard> pawnMovement(int col, int row){
+    private List<ChessBoard> pawnMovement(int col, int row){
         ChessBoard chessBoard = new ChessBoard();
         chessBoard.setCol(col);
         chessBoard.setRow(row == 8 ? row : row+1);
@@ -144,7 +115,7 @@ public class ChessApplication {
         return chessBoardList;
     }
 
-    private static ChessBoard createChessBoardObj(int col, int row){
+    private ChessBoard createChessBoardObj(int col, int row){
         if(col >= 65 && col <= 72  && row >=1 && row <=8){
             ChessBoard chessBoard = new ChessBoard();
             chessBoard.setCol(col);
@@ -154,12 +125,12 @@ public class ChessApplication {
         return  null;
     }
 
-    public static void possibleChessOutput(List<ChessBoard> chessBoardList){
+    @Override
+    public void possibleChessOutput(List<ChessBoard> chessBoardList){
         if(chessBoardList.isEmpty())
             throw new InvalidInputException("Please enter valid input");
         chessBoardList.stream().filter(Objects::nonNull)
                 .map(chess -> (char)chess.getCol() + String.valueOf(chess.getRow()))
-                    .forEach(System.out::println);
+                .forEach(System.out::println);
     }
 }
-

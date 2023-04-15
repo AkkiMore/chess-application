@@ -1,4 +1,4 @@
-package com.bank.application.model;
+package com.chess.application.model;
 
 public class ChessBoard {
 

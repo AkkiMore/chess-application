@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface IChessService {
 
-    Optional<List<ChessBoard>> chessPieceMovement(int col, int row, String chessPiece);
-    void possibleChessOutput(List<ChessBoard> chessBoardList);
+    List<ChessBoard> chessPieceMovement(int col, int row, String chessPiece);
+
 }

@@ -1,30 +1,29 @@
 package com.chess.application.service;
 
-import com.chess.application.exception.InvalidInputException;
 import com.chess.application.model.ChessBoard;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public class ChessService implements IChessService{
 
     @Override
-    public Optional<List<ChessBoard>> chessPieceMovement(int col, int row, String chessPiece){
+    public List<ChessBoard> chessPieceMovement(int col, int row, String chessPiece){
         if(col >= 65 && col <= 72  && row >=1 && row <=8){
             switch (chessPiece){
                 case "KING":
-                    return Optional.of(kingMovement(col, row));
+                    return kingMovement(col, row);
                 case "QUEEN":
-                    return Optional.of(queenMovement(col, row));
-                case "PAWN":
-                    return Optional.of(pawnMovement(col, row));
+                    return queenMovement(col, row);
+                case "PAWN-BLACK":
+                    return pawnBlackMovement(col, row);
+                case "PAWN-WHITE":
+                    return pawnWhiteMovement(col, row);
                 default:
-                    return Optional.empty();
+                    return new ArrayList<>();
             }
         }else{
-            return Optional.empty();
+            return new ArrayList<>();
         }
     }
 
@@ -106,7 +105,16 @@ public class ChessService implements IChessService{
         return chessBoardList;
     }
 
-    private List<ChessBoard> pawnMovement(int col, int row){
+    private List<ChessBoard> pawnBlackMovement(int col, int row){
+        ChessBoard chessBoard = new ChessBoard();
+        chessBoard.setCol(col);
+        chessBoard.setRow(row == 1 ? row : row-1);
+        List<ChessBoard> chessBoardList = new ArrayList<>();
+        chessBoardList.add(chessBoard);
+        return chessBoardList;
+    }
+
+    private List<ChessBoard> pawnWhiteMovement(int col, int row){
         ChessBoard chessBoard = new ChessBoard();
         chessBoard.setCol(col);
         chessBoard.setRow(row == 8 ? row : row+1);
@@ -125,12 +133,4 @@ public class ChessService implements IChessService{
         return  null;
     }
 
-    @Override
-    public void possibleChessOutput(List<ChessBoard> chessBoardList){
-        if(chessBoardList.isEmpty())
-            throw new InvalidInputException("Please enter valid input");
-        chessBoardList.stream().filter(Objects::nonNull)
-                .map(chess -> (char)chess.getCol() + String.valueOf(chess.getRow()))
-                .forEach(System.out::println);
-    }
 }
